@@ -32,10 +32,15 @@ def interpret_as_bitmap(file_path, width, mode):
 
 def open_file():
     global file_path, image, tk_image, zoom_level
-    file_path = filedialog.askopenfilename(title="Выберите файл", filetypes=[("BIN Files", "*.bin"), ("All Files", "*.*")])
+    file_path = filedialog.askopenfilename(title="Выберите файл", filetypes=[("All Files", "*.*")])
     if file_path:
         file_label.config(text=f"Выбранный файл: {file_path.split('/')[-1]}")
         try:
+            # Проверка расширения
+            if not file_path.lower().endswith('.bin'):
+                messagebox.showerror("Ошибка", "Выберите файл с расширением .bin или .BIN")
+                return
+            
             width = int(width_entry.get())
             mode = mode_var.get()
             image = interpret_as_bitmap(file_path, width, mode)
@@ -45,6 +50,17 @@ def open_file():
             messagebox.showerror("Ошибка", f"Произошла ошибка при обработке файла: {e}")
     else:
         file_label.config(text="Файл не выбран")
+
+def reload_image():
+    global image, tk_image
+    if file_path:
+        try:
+            width = int(width_entry.get())
+            mode = mode_var.get()
+            image = interpret_as_bitmap(file_path, width, mode)
+            display_image()
+        except Exception as e:
+            messagebox.showerror("Ошибка", f"Произошла ошибка при перезагрузке изображения: {e}")
 
 def display_image():
     global tk_image
@@ -135,6 +151,10 @@ def zoom(event):
         zoom_level /= 1.1
     display_image()
 
+# Function to bind Ctrl + R for reloading the image
+def bind_hot_reload(event):
+    reload_image()
+
 root = tk.Tk()
 root.title("Редактор битмап изображений")
 
@@ -158,8 +178,6 @@ width_entry.pack(pady=5)
 
 mode_label = tk.Label(root, text="Режим:")
 mode_label.pack(pady=5)
-
-# Продолжение кода
 
 # Выбор режима: 1 бит (черно-белый) или 8 бит (оттенки серого)
 mode_var = tk.StringVar(value="1bit")
@@ -199,6 +217,8 @@ canvas.config(xscrollcommand=scrollbar_x.set)
 canvas.bind("<MouseWheel>", zoom)
 canvas.bind("<Button-1>", toggle_pixel)
 
-root.mainloop()
+# Привязка события для перезагрузки изображения с помощью Ctrl + R
+root.bind('<Control-r>', bind_hot_reload)
 
- 
+# Запуск основного цикла приложения
+root.mainloop()
