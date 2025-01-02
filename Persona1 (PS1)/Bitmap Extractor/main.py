@@ -40,7 +40,7 @@ def open_file():
             if not file_path.lower().endswith('.bin'):
                 messagebox.showerror("Ошибка", "Выберите файл с расширением .bin или .BIN")
                 return
-            
+
             width = int(width_entry.get())
             mode = mode_var.get()
             image = interpret_as_bitmap(file_path, width, mode)
@@ -197,6 +197,10 @@ save_button.pack(pady=5)
 # Кнопка для сохранения данных в бинарный файл
 save_bin_button = tk.Button(root, text="Сохранить в BIN файл", command=save_to_bin)
 save_bin_button.pack(pady=5)
+
+# Кнопка для перезагрузки изображения
+reload_button = tk.Button(root, text="Перезагрузить изображение", command=reload_image)
+reload_button.pack(pady=5)
 
 # Создание холста для отображения изображения с полосами прокрутки
 canvas_frame = tk.Frame(root)
